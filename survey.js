@@ -170,3 +170,22 @@ function parseData(rawDataInput) {
 
     
 }
+
+
+
+const surveyData = [
+  ["Employee ID", "Submission time", "I like the kind of work I do.",
+   "In general, I have the resources I need to be effective.",
+   "We are working at the right pace to meet our goals.",
+   "I feel empowered to get the work done for which I am responsible.",
+   "I am appropriately involved in decisions that affect my work."],
+  [1, "2021-07-28T20:35:41+00:00", 5, null, 5, 4, 4],
+  [2, "2021-07-29T07:05:41+00:00", 4, 5, 5, 3, 3],
+  [3, "2021-07-29T17:35:41+00:00", 5, 5, null, 5, 4],
+  [4, "", null, null, null, null, null],
+  [5, "2021-07-30T04:05:41+00:00", 4, 5, 5, null, 4],
+  [6, null, 5, 5, 5, 2, 3]
+];
+
+
+const parsed = parseData(surveyData);
