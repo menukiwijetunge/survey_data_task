@@ -6,7 +6,7 @@ function parseData(rawDataInput) {
   const inputDataType = typeof rawDataInput;
 
   //2D array (what this function will actually be using)
-  if (Array.isArray(rawDataInput) && rawDataInput.every(Array.isArray)) {
+  if (Array.isArray(rawDataInput) && rawDataInput.length > 0 && rawDataInput.every(row => Array.isArray(row))) {
     console.log("Detected: 2D array");
 
     //CSV or string inputs
@@ -206,7 +206,7 @@ function parseCSV(data) {
     cells.push(cur.trim());
     //Handling number values or null scenarios
     return cells.map((c) => {
-      if (!c || c.toLowerCase() === "null") return null;
+      if (!c || String(c).toLowerCase() === "null") return null;
       const n = Number(c);
       return Number.isNaN(n) ? c : n;
     });
