@@ -68,6 +68,8 @@ function parseData(rawDataInput) {
         
         //Iterate through data records
         for (let i = 1; i < rawDataInput.length; i ++){
+            //Checking for malformed rows
+            if (!Array.isArray(rawDataInput[i]) || rawDataInput[i].length < validHeadings.length) continue;
             //Skip the record if there is no submission timestamp
             const timestamp = rawDataInput[i][1];
             if (timestamp == null || String(timestamp).trim() === "" ||
