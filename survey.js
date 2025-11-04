@@ -77,11 +77,13 @@ function parseData(rawDataInput) {
              */
             for (let j = 2; j < rawDataInput[i].length; j ++){
                 const cell = rawDataInput[i][j];
-                if (!((Number.isInteger(cell) && (cell >= 1)) && (cell <= 5)) && cell != null && cell !== ""){
+                if (cell != null && cell !== "") {
+                const num = Number(cell);
+                if (!(Number.isInteger(num) && num >= 1 && num <= 5)) {
                     allInt = false;
                     break;
                 }
-                
+                }
             }
             //All checks passed so create an object for the record and add the final results array
             if (allInt){
