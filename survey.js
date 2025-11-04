@@ -1,5 +1,22 @@
-function parseData(rawData) {
-    //TODO: Check the format of the input
+function parseData(rawDataInput) {
+
+    const inputDataType = typeOf(rawDataInput);
+
+    if (Array.isArray(rawDataInput)) {
+        console.log("Detected: Array of objects");
+        
+    } else if (inputDataType === "string") {
+        console.log("Detected: String (CSV or JSON)");
+        
+    } else if (inputDataType === "object" && rawDataInput !== null) {
+        console.log("Detected: Single object");
+        
+    } else {
+        console.log("Error: Unsupported data type");
+        return null;
+    }
+
+
 
     //TODO: Seperate out into rows
 
@@ -20,7 +37,9 @@ function parseData(rawData) {
 
 
     /*
-     * TODO: DDisplay results
+     * TODO: Display results
      *      1. Print out question and corresponidng result from array
     */
 }
+
+
