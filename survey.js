@@ -140,14 +140,15 @@ function parseData(rawDataInput) {
         console.log("QUESTION".padEnd(68), "AVERAGE RATING");
         console.log("-".repeat(85));
         for (const key in averages) {
-            console.log(key.padEnd(70), " - ", averages[key])
+            console.log(key.padEnd(70), " - ", averages[key]);
         }
         console.log("=".repeat(85));
         console.log("\n\n");
         
     }
     else{
-        console.log("Invalid Table. Cannot extract records.")
+        console.log("Invalid Table. Cannot extract records.");
+        return { error: "Invalid table structure or headers." };
     }
 
     return {averages};
