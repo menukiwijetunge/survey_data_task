@@ -129,8 +129,9 @@ function parseData(rawDataInput) {
         
         //Finalizing the average rating fro each question
         for (const key of questionKeys) {
-            averages[key] = answerCounts[key] > 0 ? averages[key] / answerCounts[key] : 0;
+            averages[key] = answerCounts[key] > 0 ?  Number((averages[key] / answerCounts[key]).toFixed(2)) : 0;
         }
+        
         
         // Display average results
         console.log("\n\n\n\n");
