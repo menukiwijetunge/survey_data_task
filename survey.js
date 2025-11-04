@@ -1,3 +1,4 @@
+
 function parseData(rawDataInput) {
 
     const inputDataType = typeof rawDataInput;
@@ -27,11 +28,12 @@ function parseData(rawDataInput) {
                          "I am appropriately involved in decisions that affect my work." ]
     
     
+    
     let record;
     //Overall array structure validation
     if (rawDataInput.length >= 2){
         lengthOk = true;
-        if (rawDataInput[0].length == 7){
+        if (rawDataInput[0].length === 7){
             numColsOk = true;
             headingsOk = true;
             for (let i = 0; i < rawDataInput[0].length; i++) {
@@ -53,7 +55,7 @@ function parseData(rawDataInput) {
             allInt = true;
             for (let j = 2; j < rawDataInput[i].length; j ++){
                 const cell = rawDataInput[i][j];
-                if (!(Number.isInteger(cell) && (cell >= 1) && (cell <= 5)) && cell != null && cell !== ""){
+                if (!((Number.isInteger(cell) && (cell >= 1)) && (cell <= 5)) && cell != null && cell !== ""){
                     allInt = false;
                     break;
                 }
@@ -83,20 +85,49 @@ function parseData(rawDataInput) {
         *      2. Calculate the average for each question and store in the array 
         */
 
+        //TODO: Check if the results is at least 1
+        const questionKeys = validHeadings.slice(2);
+        const averages = Object.fromEntries(
+            questionKeys.map(heading => [heading, 0])
+        );
+        const answerCounts = Object.fromEntries(
+            questionKeys.map(heading => [heading, 0])
+        );
+        
+        for (const row of finalArr) {
+            for (const key of questionKeys) {
+                const val = row[key];
+                if (val !== null && val !== "" && val !== undefined) {
+                    averages[key] += val;
+                    answerCounts[key] += 1;
+                }
+            }
+        }
 
+        for (const key of questionKeys) {
+            averages[key] = answerCounts[key] > 0 ? averages[key] / answerCounts[key] : 0;
+        }
+        
         /*
-        * TODO: Display results
-        *      1. Print out question and corresponidng result from array
-        */
+         * TODO: Display results
+         *      1. Print out question and corresponding result from array
+         */
+
+        console.log("QUESTION".padEnd(68), "AVERAGE RATING");
+        console.log("--------------------------------------------------------------------------------------");
+        for (const key in averages) {
+            console.log(key.padEnd(70), " - ", averages[key])
+        }
 
 
     }
     else{
         console.log("Invalid Table. Cannot extract records.")
     }
+    return averages;
 
-
-    return finalArr;
+    
 }
+
 
 
