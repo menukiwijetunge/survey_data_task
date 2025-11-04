@@ -1,6 +1,6 @@
 function parseData(rawDataInput) {
 
-    const inputDataType = typeOf(rawDataInput);
+    const inputDataType = typeof rawDataInput;
 
     if (Array.isArray(rawDataInput)) {
         console.log("Detected: Array of objects");
@@ -16,30 +16,87 @@ function parseData(rawDataInput) {
         return null;
     }
 
+    //TODO: Validate
+    let lengthOk = false;
+    let numColsOk = false;
+    let headingsOk = false;
+    let validHeadings = ["Employee ID", "Submission time", "I like the kind of work I do.",
+                         "In general, I have the resources I need to be effective.",
+                         "We are working at the right pace to meet our goals.",
+                         "I feel empowered to get the work done for which I am responsible.",
+                         "I am appropriately involved in decisions that affect my work." ]
+    
+    
+    let record;
+    //Overall array structure validation
+    if (rawDataInput.length >= 2){
+        lengthOk = true;
+        if (rawDataInput[0].length == 7){
+            numColsOk = true;
+            headingsOk = true;
+            for (let i = 0; i < rawDataInput[0].length; i++) {
+                if (rawDataInput[0][i] != validHeadings[i]){
+                    headingsOk = false;
+                    break
+                }
+            }
+        }
+    }
+    
+    let finalArr = [];
+    let allInt = true;
+
+    //Record validation
+    if (lengthOk && numColsOk && headingsOk) {
+        for (let i = 1; i < rawDataInput.length; i ++){
+            if (!rawDataInput[i][1]) continue;
+            allInt = true;
+            for (let j = 2; j < rawDataInput[i].length; j ++){
+                const cell = rawDataInput[i][j];
+                if (!(Number.isInteger(cell) && (cell >= 1) && (cell <= 5)) && cell != null && cell !== ""){
+                    allInt = false;
+                    break;
+                }
+                
+            }
+            if (allInt){
+                record = {
+                    "Employee ID": rawDataInput[i][0],
+                    "Submission time": rawDataInput[i][1],
+                    "I like the kind of work I do.":rawDataInput[i][2],
+                    "In general, I have the resources I need to be effective.": rawDataInput[i][3],
+                    "We are working at the right pace to meet our goals.": rawDataInput[i][4],
+                    "I feel empowered to get the work done for which I am responsible.": rawDataInput[i][5],
+                    "I am appropriately involved in decisions that affect my work.": rawDataInput[i][6]
+                };
+                finalArr.push(record);
+                
+            }
+
+        }
 
 
-    //TODO: Seperate out into rows
-
-    /*
-     * TODO: Filter rows:
-     *      1. Exclude headers
-     *      2. Check submission time
-     *      3. Check Data types (should be integer (1 to 5) answer for each question)
-     */
+        /*
+        * TODO: Calculate and save results:
+        *      1. Form an array with the average to result for each question 
+        *       (question number identified by index)
+        *      2. Calculate the average for each question and store in the array 
+        */
 
 
-    /*
-     * TODO: Calculate and save results:
-     *      1. Form an array with the average to result for each question 
-     *       (question number identified by index)
-     *      2. Calculate the average for each question and store in the array 
-    */
+        /*
+        * TODO: Display results
+        *      1. Print out question and corresponidng result from array
+        */
 
 
-    /*
-     * TODO: Display results
-     *      1. Print out question and corresponidng result from array
-    */
+    }
+    else{
+        console.log("Invalid Table. Cannot extract records.")
+    }
+
+
+    return finalArr;
 }
 
 
