@@ -161,6 +161,8 @@ function parseData(rawDataInput) {
 
     // Display average results
     printAvgs(averages);
+    console.log(`\nProcessed ${finalArr.length} out of ${rawDataInput.length - 1} records`);
+    
   } else {
     console.log("Invalid Table. Cannot extract records.");
     return { error: "Invalid table structure or headers." };
