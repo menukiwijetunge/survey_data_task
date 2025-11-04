@@ -69,7 +69,12 @@ function parseData(rawDataInput) {
         //Iterate through data records
         for (let i = 1; i < rawDataInput.length; i ++){
             //Skip the record if there is no submission timestamp
-            if (!rawDataInput[i][1]) continue;
+            const timestamp = rawDataInput[i][1];
+            if (timestamp == null || String(timestamp).trim() === "" ||
+                Number.isNaN(Date.parse(String(timestamp)))) {
+                continue;
+            }
+
             allInt = true;
             /*
              * Check if the answers to questions are valid integers between 1 to 5 
