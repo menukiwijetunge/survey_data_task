@@ -1,4 +1,3 @@
-
 function parseData(rawDataInput) {
 
     const inputDataType = typeof rawDataInput;
@@ -26,8 +25,7 @@ function parseData(rawDataInput) {
                          "We are working at the right pace to meet our goals.",
                          "I feel empowered to get the work done for which I am responsible.",
                          "I am appropriately involved in decisions that affect my work." ]
-    
-    
+
     
     let record;
     //Overall array structure validation
@@ -47,9 +45,51 @@ function parseData(rawDataInput) {
     
     let finalArr = [];
     let allInt = true;
+    
 
+
+    let header = "";
     //Record validation
     if (lengthOk && numColsOk && headingsOk) {
+        const colWidth = 25;
+        console.log("=".repeat(colWidth * rawDataInput[0].length + rawDataInput[0].length * 3));
+        const wrapped = validHeadings.map(h => {
+            const words = h.split(" ");
+            let line = "";
+            const lines = [];
+            for (const word of words) {
+                if ((line + word).length > colWidth) {
+                lines.push(line.trim());
+                line = "";
+                }
+                line += word + " ";
+            }
+            if (line.trim()) lines.push(line.trim());
+            return lines;
+            });
+        const maxLines = Math.max(...wrapped.map(w => w.length));
+        for (let lineNum = 0; lineNum < maxLines; lineNum++) {
+        let row = "";
+        for (const col of wrapped) {
+            const text = col[lineNum] || "";
+            row += text.padEnd(colWidth) + " | ";
+        }
+        console.log(row);
+        }
+        console.log("=".repeat(colWidth * rawDataInput[0].length + rawDataInput[0].length * 3));
+        for (let i = 1; i < rawDataInput.length; i++) {
+            let row = "";
+            for (const cell of rawDataInput[i]) {
+                const val = cell === undefined || cell === null || cell === "" ? "-" : cell;
+                row += String(val).padEnd(colWidth) + " | ";
+            }
+            console.log(row);
+        }
+        console.log("=".repeat(colWidth * rawDataInput[0].length + rawDataInput[0].length * 3));
+
+
+
+
         for (let i = 1; i < rawDataInput.length; i ++){
             if (!rawDataInput[i][1]) continue;
             allInt = true;
@@ -112,22 +152,21 @@ function parseData(rawDataInput) {
          * TODO: Display results
          *      1. Print out question and corresponding result from array
          */
-
+        console.log("\n\n\n\n");
+        console.log("=".repeat(85));
         console.log("QUESTION".padEnd(68), "AVERAGE RATING");
-        console.log("--------------------------------------------------------------------------------------");
+        console.log("-".repeat(85));
         for (const key in averages) {
             console.log(key.padEnd(70), " - ", averages[key])
         }
-
+        console.log("=".repeat(85));
+        console.log("\n\n");
 
     }
     else{
         console.log("Invalid Table. Cannot extract records.")
     }
-    return averages;
+    //return averages;
 
     
 }
-
-
-
