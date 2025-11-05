@@ -1,71 +1,90 @@
+/*
+ * Global variable to store all valid table headings for the survey table
+ */
 const VALID_HEADINGS = [
-    "Employee ID",
-    "Submission time",
-    "I like the kind of work I do.",
-    "In general, I have the resources I need to be effective.",
-    "We are working at the right pace to meet our goals.",
-    "I feel empowered to get the work done for which I am responsible.",
-    "I am appropriately involved in decisions that affect my work.",
-  ];
+  "Employee ID",
+  "Submission time",
+  "I like the kind of work I do.",
+  "In general, I have the resources I need to be effective.",
+  "We are working at the right pace to meet our goals.",
+  "I feel empowered to get the work done for which I am responsible.",
+  "I am appropriately involved in decisions that affect my work.",
+];
 
-
-
+//############################ CORE FUNCTION ###################################
 /*
  * Function to parse and analyze survey data (This is the core function of this task.)
  */
 function parseData(rawDataInput) {
-      const prep = analysisPrep(rawDataInput);   
+  //PARSING & PREPARING DATA FOR ANALYSIS---------------------------------------
+  /*
+   * Preparing data for analysis
+   * (Contains logic that could possibly be repeated for other scenarios
+   *  while minimizing code redundancy.)
+   */
+  const prep = analysisPrep(rawDataInput);
 
-    if (prep.error) {
-      return { error: prep.error };           
-    }
+  //Check for errors when preparing thhe data
+  if (prep.error) {
+    return { error: prep.error };
+  }
 
-    const { finalArr, arrayDataInput } = prep;
+  /*
+   *Get:
+   *    - finalArr: the data used for analysis (after filtering and cleaning)
+   *    - arrayDataInput: Cleaned structured table built before filtering
+   *                      records. Used for console prints.
+   */
+  const { finalArr, arrayDataInput } = prep;
 
-  //This is what will be returned
+  //This is what will be returned in this fucntion
   let averages = {};
 
-    //PREPARING ANALYISIS TABLE---------------------------------------------
+  //PREPARING ANALYISIS TABLE---------------------------------------------------
 
-    //Preparing new table for average display
-    const questionKeys = VALID_HEADINGS.slice(2);
-    averages = Object.fromEntries(questionKeys.map((heading) => [heading, 0]));
-    //Keeping track of entries that have answers for a certain question
-    const answerCounts = Object.fromEntries(
-      questionKeys.map((heading) => [heading, 0])
-    );
+  //Preparing new table for average display
+  const questionKeys = VALID_HEADINGS.slice(2);
+  averages = Object.fromEntries(questionKeys.map((heading) => [heading, 0]));
+  //Keeping track of entries that have answers for a certain question
+  const answerCounts = Object.fromEntries(
+    questionKeys.map((heading) => [heading, 0])
+  );
 
-    //Filling the averages table and summing up the values of the ratings for the corresponding questions
-    for (const row of finalArr) {
-      for (const key of questionKeys) {
-        let val = row[key];
-        if (val !== null && val !== "" && val !== undefined) {
-          val = Number(val);
-          if (!Number.isNaN(val)) {
-            averages[key] += val;
-            answerCounts[key] += 1;
-          }
+  /*
+   * Filling the averages table and summing up the values of the ratings for the
+   * corresponding questions
+   */
+  for (const row of finalArr) {
+    for (const key of questionKeys) {
+      let val = row[key];
+      if (val !== null && val !== "" && val !== undefined) {
+        val = Number(val);
+        if (!Number.isNaN(val)) {
+          averages[key] += val;
+          answerCounts[key] += 1;
         }
       }
     }
+  }
 
-    //Finalizing the average rating for each question
-    for (const key of questionKeys) {
-      averages[key] =
-        answerCounts[key] > 0
-          ? Number((averages[key] / answerCounts[key]).toFixed(2))
-          : 0;
-    }
-    //--------------------------------------------------------------------------
+  //Finalizing the average rating for each question
+  for (const key of questionKeys) {
+    averages[key] =
+      answerCounts[key] > 0
+        ? Number((averages[key] / answerCounts[key]).toFixed(2))
+        : 0;
+  }
+  //--------------------------------------------------------------------------
 
-    // Display average results
-    printAvgs(averages);
-    console.log(`\nProcessed ${finalArr.length} out of ${arrayDataInput.length - 1} records`);
-    
- 
+  // Display average results
+  printAvgs(averages);
+  console.log(
+    `\nProcessed ${finalArr.length} out of ${arrayDataInput.length - 1} records`
+  );
 
   return { averages };
 }
+//##############################################################################
 
 //HELPER FUNCTIONS==============================================================
 
@@ -89,7 +108,7 @@ function parseCSV(data) {
       if (ch === '"') inQuotes = !inQuotes;
       else if (ch === sep && !inQuotes) {
         const next = line.slice(i + 1, i + 3);
-        // Comma followed by a space used to distinguish columns within cell 
+        // Comma followed by a space used to distinguish columns within cell
         // data from a delimiter symbol
         if (sep === "," && next.startsWith(" ") && /[A-Za-z]/.test(next[1]))
           cur += ch;
@@ -169,17 +188,18 @@ function printFullTable(rawDataInput, headings) {
 /*
  * Helper function to handle different forms of input data----------------------
  */
-function inputTypeCheck(rawDataInput){
-
+function inputTypeCheck(rawDataInput) {
   let checkedDataInput = rawDataInput;
   //2D array (what this function will actually be using)
-  if (Array.isArray(checkedDataInput) && checkedDataInput.length > 0 && 
-     checkedDataInput.every(row => Array.isArray(row))) {
+  if (
+    Array.isArray(checkedDataInput) &&
+    checkedDataInput.length > 0 &&
+    checkedDataInput.every((row) => Array.isArray(row))
+  ) {
     console.log("Detected: 2D array");
-       
 
     //CSV or string inputs
- } else if (typeof checkedDataInput === "string") {
+  } else if (typeof checkedDataInput === "string") {
     checkedDataInput = parseCSV(checkedDataInput);
 
     //Other input types out of scope
@@ -191,16 +211,12 @@ function inputTypeCheck(rawDataInput){
   return checkedDataInput;
 }
 
-
-
-
 /*
  * Helper function to handle 2D array validation--------------------------------
  */
 
 function arrayValidation(arrayDataInput) {
   //This is what will be returned
-  
 
   //Validating table data
   let lengthOk = false;
@@ -231,86 +247,83 @@ function arrayValidation(arrayDataInput) {
 /*
  * Helper function to prepare the data records to be used in analysis-----------
  */
-function dataRecordPrep(arrayDataInput){
-  
+function dataRecordPrep(arrayDataInput) {
   let finalArr = [];
 
   //Iterate through data records
-    for (let i = 1; i < arrayDataInput.length; i++) {
-      let allInt = true;
-      //Checking for malformed rows
-      if (!Array.isArray(arrayDataInput[i]) ||
-         arrayDataInput[i].length < VALID_HEADINGS.length)
-        continue;
-      //Skip the record if there is no submission timestamp
-      const timestamp = arrayDataInput[i][1];
-      if (timestamp == null ||
-         String(timestamp).trim() === "" ||
-         Number.isNaN(Date.parse(String(timestamp)))
-         ) {
-        continue;
-      }
-
-      /*
-       * Check if the answers to questions are valid integers between 1 to 5
-       * (inclusive) or unanswered.
-       */
-      for (let j = 2; j < arrayDataInput[i].length; j++) {
-        const cell = arrayDataInput[i][j];
-        if (cell != null && cell !== "") {
-          const num = Number(cell);
-          if (!(Number.isInteger(num) && num >= 1 && num <= 5)) {
-            allInt = false;
-            break;
-          }
-        }
-      }
-      let record;
-
-      //All checks passed so create an object for the record and add the final results array
-      if (allInt) {
-        record = {
-          "Employee ID": arrayDataInput[i][0],
-          "Submission time": arrayDataInput[i][1],
-          "I like the kind of work I do.": arrayDataInput[i][2],
-          "In general, I have the resources I need to be effective.":
-            arrayDataInput[i][3],
-          "We are working at the right pace to meet our goals.":
-            arrayDataInput[i][4],
-          "I feel empowered to get the work done for which I am responsible.":
-            arrayDataInput[i][5],
-          "I am appropriately involved in decisions that affect my work.":
-            arrayDataInput[i][6],
-        };
-        finalArr.push(record);
-      }
+  for (let i = 1; i < arrayDataInput.length; i++) {
+    let allInt = true;
+    //Checking for malformed rows
+    if (
+      !Array.isArray(arrayDataInput[i]) ||
+      arrayDataInput[i].length < VALID_HEADINGS.length
+    )
+      continue;
+    //Skip the record if there is no submission timestamp
+    const timestamp = arrayDataInput[i][1];
+    if (
+      timestamp == null ||
+      String(timestamp).trim() === "" ||
+      Number.isNaN(Date.parse(String(timestamp)))
+    ) {
+      continue;
     }
 
-    return finalArr;
+    /*
+     * Check if the answers to questions are valid integers between 1 to 5
+     * (inclusive) or unanswered.
+     */
+    for (let j = 2; j < arrayDataInput[i].length; j++) {
+      const cell = arrayDataInput[i][j];
+      if (cell != null && cell !== "") {
+        const num = Number(cell);
+        if (!(Number.isInteger(num) && num >= 1 && num <= 5)) {
+          allInt = false;
+          break;
+        }
+      }
+    }
+    let record;
+
+    //All checks passed so create an object for the record and add the final results array
+    if (allInt) {
+      record = {
+        "Employee ID": arrayDataInput[i][0],
+        "Submission time": arrayDataInput[i][1],
+        "I like the kind of work I do.": arrayDataInput[i][2],
+        "In general, I have the resources I need to be effective.":
+          arrayDataInput[i][3],
+        "We are working at the right pace to meet our goals.":
+          arrayDataInput[i][4],
+        "I feel empowered to get the work done for which I am responsible.":
+          arrayDataInput[i][5],
+        "I am appropriately involved in decisions that affect my work.":
+          arrayDataInput[i][6],
+      };
+      finalArr.push(record);
+    }
+  }
+
+  return finalArr;
 }
 
-
-
-
+/*
+ * Helper function to call all necessary functions to prep data for the specific analysis
+ */
 function analysisPrep(rawDataInput) {
-   //CHECKING THE DATA TYPE OF THE INPUT---------------------------------------
+  //CHECKING THE DATA TYPE OF THE INPUT-----------------------------------------
   const arrayDataInput = inputTypeCheck(rawDataInput);
   if (!arrayDataInput) {
     return { error: "Unsupported or invalid input type" };
   }
-  //--------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 
-
-
-  //2D ARRAY VALIDATION------------------------------------------------------- 
+  //2D ARRAY VALIDATION---------------------------------------------------------
   const { headingsOk, numColsOk, lengthOk } = arrayValidation(arrayDataInput);
-  //--------------------------------------------------------------------------
+  //----------------------------------------------------------------------------
 
+  // DATA ROW VALIDATION & FILTERING--------------------------------------------
 
-  
-  // DATA ROW VALIDATION & FILTERING------------------------------------------
- 
-  
   // Array to store final records that will be use for analysis
   let finalArr = [];
 
@@ -320,16 +333,12 @@ function analysisPrep(rawDataInput) {
     console.log("PRINT ORIGINAL TABLE");
     printFullTable(arrayDataInput, VALID_HEADINGS);
     finalArr = dataRecordPrep(arrayDataInput);
-    return {finalArr, arrayDataInput};
-  
+    return { finalArr, arrayDataInput };
   } else {
     console.log("Invalid Table. Cannot extract records.");
     return { error: "Invalid table structure or headers." };
   }
-  
 }
-
-
 
 /*
  * Helper function to print average ratings table-------------------------------
@@ -347,8 +356,9 @@ function printAvgs(averages) {
   console.log("\n\n");
 }
 
-//=========================================================================================================
+//==============================================================================
 
+// CODE THAT CALLS THE CORE FUNCTION
 const fs = require("fs");
 
 const surveyData = [
