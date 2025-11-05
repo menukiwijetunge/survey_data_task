@@ -35,9 +35,10 @@ function parseData(rawDataInput) {
   // DATA ROW VALIDATION & FILTERING------------------------------------------
   //This is what will be returned
   let averages = {};
-
-  // //Validating table data
-  let allInt = true;
+  
+  
+  // // //Validating table data
+  // let allInt = true;
   // Array to store final records that will be use for analysis
   let finalArr = [];
 
@@ -46,61 +47,7 @@ function parseData(rawDataInput) {
     //Printing original table before analysis
     console.log("PRINT ORIGINAL TABLE");
     printFullTable(arrayDataInput, VALID_HEADINGS);
-
-    //Iterate through data records
-    for (let i = 1; i < arrayDataInput.length; i++) {
-      //Checking for malformed rows
-      if (
-        !Array.isArray(arrayDataInput[i]) ||
-        arrayDataInput[i].length < VALID_HEADINGS.length
-      )
-        continue;
-      //Skip the record if there is no submission timestamp
-      const timestamp = arrayDataInput[i][1];
-      if (
-        timestamp == null ||
-        String(timestamp).trim() === "" ||
-        Number.isNaN(Date.parse(String(timestamp)))
-      ) {
-        continue;
-      }
-
-      allInt = true;
-      /*
-       * Check if the answers to questions are valid integers between 1 to 5
-       * (inclusive) or unanswered.
-       */
-      for (let j = 2; j < arrayDataInput[i].length; j++) {
-        const cell = arrayDataInput[i][j];
-        if (cell != null && cell !== "") {
-          const num = Number(cell);
-          if (!(Number.isInteger(num) && num >= 1 && num <= 5)) {
-            allInt = false;
-            break;
-          }
-        }
-      }
-      let record;
-
-      //All checks passed so create an object for the record and add the final results array
-      if (allInt) {
-        record = {
-          "Employee ID": arrayDataInput[i][0],
-          "Submission time": arrayDataInput[i][1],
-          "I like the kind of work I do.": arrayDataInput[i][2],
-          "In general, I have the resources I need to be effective.":
-            arrayDataInput[i][3],
-          "We are working at the right pace to meet our goals.":
-            arrayDataInput[i][4],
-          "I feel empowered to get the work done for which I am responsible.":
-            arrayDataInput[i][5],
-          "I am appropriately involved in decisions that affect my work.":
-            arrayDataInput[i][6],
-        };
-        finalArr.push(record);
-      }
-    }
-
+    finalArr = dataRecordPrep(arrayDataInput);
     //----------------------------------------------------------------------
 
     //PREPARING ANALYISIS TABLE---------------------------------------------
@@ -195,14 +142,14 @@ function parseCSV(data) {
 /*
  * Helper function to print survey data table-----------------------------------
  */
-function printFullTable(rawDataInput, VALID_HEADINGS) {
+function printFullTable(rawDataInput, headings) {
   const colWidth = 25; //Column width
   console.log(
     "=".repeat(colWidth * rawDataInput[0].length + rawDataInput[0].length * 3)
   ); //Border
 
   //Word wrap column headings since they are small
-  const wrapped = VALID_HEADINGS.map((h) => {
+  const wrapped = headings.map((h) => {
     const words = h.split(" ");
     let line = "";
     const lines = [];
@@ -308,6 +255,72 @@ function arrayValidation(arrayDataInput) {
 
   return { headingsOk, numColsOk, lengthOk };
 }
+
+/*
+ * Helper function to prepare the data records to be used in analysis-----------
+ */
+function dataRecordPrep(arrayDataInput){
+  
+  let finalArr = [];
+
+  //Iterate through data records
+    for (let i = 1; i < arrayDataInput.length; i++) {
+      let allInt = true;
+      //Checking for malformed rows
+      if (!Array.isArray(arrayDataInput[i]) ||
+         arrayDataInput[i].length < VALID_HEADINGS.length)
+        continue;
+      //Skip the record if there is no submission timestamp
+      const timestamp = arrayDataInput[i][1];
+      if (timestamp == null ||
+         String(timestamp).trim() === "" ||
+         Number.isNaN(Date.parse(String(timestamp)))
+         ) {
+        continue;
+      }
+
+      /*
+       * Check if the answers to questions are valid integers between 1 to 5
+       * (inclusive) or unanswered.
+       */
+      for (let j = 2; j < arrayDataInput[i].length; j++) {
+        const cell = arrayDataInput[i][j];
+        if (cell != null && cell !== "") {
+          const num = Number(cell);
+          if (!(Number.isInteger(num) && num >= 1 && num <= 5)) {
+            allInt = false;
+            break;
+          }
+        }
+      }
+      let record;
+
+      //All checks passed so create an object for the record and add the final results array
+      if (allInt) {
+        record = {
+          "Employee ID": arrayDataInput[i][0],
+          "Submission time": arrayDataInput[i][1],
+          "I like the kind of work I do.": arrayDataInput[i][2],
+          "In general, I have the resources I need to be effective.":
+            arrayDataInput[i][3],
+          "We are working at the right pace to meet our goals.":
+            arrayDataInput[i][4],
+          "I feel empowered to get the work done for which I am responsible.":
+            arrayDataInput[i][5],
+          "I am appropriately involved in decisions that affect my work.":
+            arrayDataInput[i][6],
+        };
+        finalArr.push(record);
+      }
+    }
+
+    return finalArr;
+}
+
+
+
+
+
 
 /*
  * Helper function to print average ratings table-------------------------------
