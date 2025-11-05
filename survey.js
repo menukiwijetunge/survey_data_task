@@ -3,22 +3,10 @@
  */
 function parseData(rawDataInput) {
   //CHECKING THE DATA TYPE OF THE INPUT---------------------------------------
-  const inputDataType = typeof rawDataInput;
-
-  //2D array (what this function will actually be using)
-  if (Array.isArray(rawDataInput) && rawDataInput.length > 0 && rawDataInput.every(row => Array.isArray(row))) {
-    console.log("Detected: 2D array");
-
-    //CSV or string inputs
-  } else if (inputDataType === "string") {
-    rawDataInput = parseCSV(rawDataInput);
-
-    //Other input types out of scope
-  } else {
-    console.log("Error: Unsupported data type");
-    return null;
+  const arrayDataInput = inputTypeCheck(rawDataInput);
+  if (!arrayDataInput) {
+    return { error: "Unsupported or invalid input type" };
   }
-
   //--------------------------------------------------------------------------
 
   //2D ARRAY VALIDATION-------------------------------------------------------
@@ -45,15 +33,15 @@ function parseData(rawDataInput) {
 
   // Overall array structure validation
   // Has at least one record apart from header
-  if (rawDataInput.length >= 2) {
+  if (arrayDataInput.length >= 2) {
     lengthOk = true;
     //Has exactly 7 columns
-    if (rawDataInput[0].length === validHeadings.length) {
+    if (arrayDataInput[0].length === validHeadings.length) {
       numColsOk = true;
       headingsOk = true;
       //Has the exact column headings in validHeadings
-      for (let i = 0; i < rawDataInput[0].length; i++) {
-        if (rawDataInput[0][i] !== validHeadings[i]) {
+      for (let i = 0; i < arrayDataInput[0].length; i++) {
+        if (arrayDataInput[0][i] !== validHeadings[i]) {
           headingsOk = false;
           break;
         }
@@ -70,18 +58,18 @@ function parseData(rawDataInput) {
   if (lengthOk && numColsOk && headingsOk) {
     //Printing original table before analysis
     console.log("PRINT ORIGINAL TABLE");
-    printFullTable(rawDataInput, validHeadings);
+    printFullTable(arrayDataInput, validHeadings);
 
     //Iterate through data records
-    for (let i = 1; i < rawDataInput.length; i++) {
+    for (let i = 1; i < arrayDataInput.length; i++) {
       //Checking for malformed rows
       if (
-        !Array.isArray(rawDataInput[i]) ||
-        rawDataInput[i].length < validHeadings.length
+        !Array.isArray(arrayDataInput[i]) ||
+        arrayDataInput[i].length < validHeadings.length
       )
         continue;
       //Skip the record if there is no submission timestamp
-      const timestamp = rawDataInput[i][1];
+      const timestamp = arrayDataInput[i][1];
       if (
         timestamp == null ||
         String(timestamp).trim() === "" ||
@@ -95,8 +83,8 @@ function parseData(rawDataInput) {
        * Check if the answers to questions are valid integers between 1 to 5
        * (inclusive) or unanswered.
        */
-      for (let j = 2; j < rawDataInput[i].length; j++) {
-        const cell = rawDataInput[i][j];
+      for (let j = 2; j < arrayDataInput[i].length; j++) {
+        const cell = arrayDataInput[i][j];
         if (cell != null && cell !== "") {
           const num = Number(cell);
           if (!(Number.isInteger(num) && num >= 1 && num <= 5)) {
@@ -108,17 +96,17 @@ function parseData(rawDataInput) {
       //All checks passed so create an object for the record and add the final results array
       if (allInt) {
         record = {
-          "Employee ID": rawDataInput[i][0],
-          "Submission time": rawDataInput[i][1],
-          "I like the kind of work I do.": rawDataInput[i][2],
+          "Employee ID": arrayDataInput[i][0],
+          "Submission time": arrayDataInput[i][1],
+          "I like the kind of work I do.": arrayDataInput[i][2],
           "In general, I have the resources I need to be effective.":
-            rawDataInput[i][3],
+            arrayDataInput[i][3],
           "We are working at the right pace to meet our goals.":
-            rawDataInput[i][4],
+            arrayDataInput[i][4],
           "I feel empowered to get the work done for which I am responsible.":
-            rawDataInput[i][5],
+            arrayDataInput[i][5],
           "I am appropriately involved in decisions that affect my work.":
-            rawDataInput[i][6],
+            arrayDataInput[i][6],
         };
         finalArr.push(record);
       }
@@ -161,7 +149,7 @@ function parseData(rawDataInput) {
 
     // Display average results
     printAvgs(averages);
-    console.log(`\nProcessed ${finalArr.length} out of ${rawDataInput.length - 1} records`);
+    console.log(`\nProcessed ${finalArr.length} out of ${arrayDataInput.length - 1} records`);
     
   } else {
     console.log("Invalid Table. Cannot extract records.");
@@ -270,8 +258,28 @@ function printFullTable(rawDataInput, validHeadings) {
   ); // border
 }
 
+/*
+ * Helper function to handle different forms of input data-------------------------------
+ */
+function inputTypeCheck(rawDataInput){
+    const inputDataType = typeof rawDataInput;
 
+  //2D array (what this function will actually be using)
+  if (Array.isArray(rawDataInput) && rawDataInput.length > 0 && rawDataInput.every(row => Array.isArray(row))) {
+    console.log("Detected: 2D array");
 
+    //CSV or string inputs
+  } else if (inputDataType === "string") {
+    rawDataInput = parseCSV(rawDataInput);
+
+    //Other input types out of scope
+  } else {
+    console.log("Error: Unsupported data type");
+    return null;
+  }
+
+  return rawDataInput;
+}
 
 /*
  * Helper function to print average ratings table-------------------------------
