@@ -80,7 +80,7 @@ function parseData(rawDataInput) {
   //--------------------------------------------------------------------------
 
   // Display average results
-  printTwoColTable(averages, "AVERAGE RATINGs", "AVERAGE RATING")
+  printTwoColTable(averages, "AVERAGE RATINGS", "AVERAGE RATING")
   console.log(
     `\nProcessed ${finalArr.length} out of ${arrayDataInput.length - 1} records`
   );
@@ -348,9 +348,9 @@ function analysisPrep(rawDataInput) {
  */
 function printTwoColTable(vals, tableHeading, colHeading) {
   console.log("\n\n\n\n");
-  console.log("AVERAGE RATINGS");
+  console.log(tableHeading);
   console.log("=".repeat(85));
-  console.log("QUESTION".padEnd(68), "AVERAGE RATING");
+  console.log("QUESTION".padEnd(68), colHeading);
   console.log("-".repeat(85));
   for (const key in vals) {
     console.log(key.padEnd(70), " - ", vals[key]);
