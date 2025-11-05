@@ -10,6 +10,10 @@ const VALID_HEADINGS = [
   "I feel empowered to get the work done for which I am responsible.",
   "I am appropriately involved in decisions that affect my work.",
 ];
+/*
+ * Global variable to store all survey questions
+ */
+const QUESTION_KEYS = VALID_HEADINGS.slice(2);
 
 //############################ CORE FUNCTION ###################################
 /*
@@ -43,11 +47,10 @@ function parseData(rawDataInput) {
   //PREPARING ANALYISIS TABLE---------------------------------------------------
 
   //Preparing new table for average display
-  const questionKeys = VALID_HEADINGS.slice(2);
-  averages = Object.fromEntries(questionKeys.map((heading) => [heading, 0]));
+  averages = Object.fromEntries(QUESTION_KEYS.map((heading) => [heading, 0]));
   //Keeping track of entries that have answers for a certain question
   const answerCounts = Object.fromEntries(
-    questionKeys.map((heading) => [heading, 0])
+    QUESTION_KEYS.map((heading) => [heading, 0])
   );
 
   /*
@@ -55,7 +58,7 @@ function parseData(rawDataInput) {
    * corresponding questions
    */
   for (const row of finalArr) {
-    for (const key of questionKeys) {
+    for (const key of QUESTION_KEYS) {
       let val = row[key];
       if (val !== null && val !== "" && val !== undefined) {
         val = Number(val);
@@ -68,7 +71,7 @@ function parseData(rawDataInput) {
   }
 
   //Finalizing the average rating for each question
-  for (const key of questionKeys) {
+  for (const key of QUESTION_KEYS) {
     averages[key] =
       answerCounts[key] > 0
         ? Number((averages[key] / answerCounts[key]).toFixed(2))
