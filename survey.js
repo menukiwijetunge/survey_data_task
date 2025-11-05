@@ -262,15 +262,16 @@ function printFullTable(rawDataInput, validHeadings) {
  * Helper function to handle different forms of input data-------------------------------
  */
 function inputTypeCheck(rawDataInput){
-    const inputDataType = typeof rawDataInput;
 
+  let checkedDataInput = rawDataInput;
   //2D array (what this function will actually be using)
-  if (Array.isArray(rawDataInput) && rawDataInput.length > 0 && rawDataInput.every(row => Array.isArray(row))) {
+  if (Array.isArray(checkedDataInput) && checkedDataInput.length > 0 && checkedDataInput.every(row => Array.isArray(row))) {
     console.log("Detected: 2D array");
+       
 
     //CSV or string inputs
-  } else if (inputDataType === "string") {
-    rawDataInput = parseCSV(rawDataInput);
+ } else if (typeof checkedDataInput === "string") {
+    checkedDataInput = parseCSV(checkedDataInput);
 
     //Other input types out of scope
   } else {
@@ -278,7 +279,7 @@ function inputTypeCheck(rawDataInput){
     return null;
   }
 
-  return rawDataInput;
+  return checkedDataInput;
 }
 
 /*
