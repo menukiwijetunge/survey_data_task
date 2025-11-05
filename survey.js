@@ -11,44 +11,19 @@ const VALID_HEADINGS = [
 
 
 /*
- * Function to parse and analyze survey data
+ * Function to parse and analyze survey data (This is the core function of this task.)
  */
 function parseData(rawDataInput) {
-  //CHECKING THE DATA TYPE OF THE INPUT---------------------------------------
-  const arrayDataInput = inputTypeCheck(rawDataInput);
-  if (!arrayDataInput) {
-    return { error: "Unsupported or invalid input type" };
-  }
-  //--------------------------------------------------------------------------
+      const prep = analysisPrep(rawDataInput);   
 
+    if (prep.error) {
+      return { error: prep.error };           
+    }
 
+    const { finalArr, arrayDataInput } = prep;
 
-
-  //2D ARRAY VALIDATION------------------------------------------------------- 
-  const { headingsOk, numColsOk, lengthOk } = arrayValidation(arrayDataInput);
-  //--------------------------------------------------------------------------
-
-
-
-
-  
-  // DATA ROW VALIDATION & FILTERING------------------------------------------
   //This is what will be returned
   let averages = {};
-  
-  
-  // // //Validating table data
-  // let allInt = true;
-  // Array to store final records that will be use for analysis
-  let finalArr = [];
-
-  //Record validation (Done if table structure meets requirements)
-  if (lengthOk && numColsOk && headingsOk) {
-    //Printing original table before analysis
-    console.log("PRINT ORIGINAL TABLE");
-    printFullTable(arrayDataInput, VALID_HEADINGS);
-    finalArr = dataRecordPrep(arrayDataInput);
-    //----------------------------------------------------------------------
 
     //PREPARING ANALYISIS TABLE---------------------------------------------
 
@@ -87,10 +62,7 @@ function parseData(rawDataInput) {
     printAvgs(averages);
     console.log(`\nProcessed ${finalArr.length} out of ${arrayDataInput.length - 1} records`);
     
-  } else {
-    console.log("Invalid Table. Cannot extract records.");
-    return { error: "Invalid table structure or headers." };
-  }
+ 
 
   return { averages };
 }
@@ -319,6 +291,43 @@ function dataRecordPrep(arrayDataInput){
 
 
 
+
+function analysisPrep(rawDataInput) {
+   //CHECKING THE DATA TYPE OF THE INPUT---------------------------------------
+  const arrayDataInput = inputTypeCheck(rawDataInput);
+  if (!arrayDataInput) {
+    return { error: "Unsupported or invalid input type" };
+  }
+  //--------------------------------------------------------------------------
+
+
+
+  //2D ARRAY VALIDATION------------------------------------------------------- 
+  const { headingsOk, numColsOk, lengthOk } = arrayValidation(arrayDataInput);
+  //--------------------------------------------------------------------------
+
+
+  
+  // DATA ROW VALIDATION & FILTERING------------------------------------------
+ 
+  
+  // Array to store final records that will be use for analysis
+  let finalArr = [];
+
+  //Record validation (Done if table structure meets requirements)
+  if (lengthOk && numColsOk && headingsOk) {
+    //Printing original table before analysis
+    console.log("PRINT ORIGINAL TABLE");
+    printFullTable(arrayDataInput, VALID_HEADINGS);
+    finalArr = dataRecordPrep(arrayDataInput);
+    return {finalArr, arrayDataInput};
+  
+  } else {
+    console.log("Invalid Table. Cannot extract records.");
+    return { error: "Invalid table structure or headers." };
+  }
+  
+}
 
 
 
