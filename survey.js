@@ -1,3 +1,15 @@
+const VALID_HEADINGS = [
+    "Employee ID",
+    "Submission time",
+    "I like the kind of work I do.",
+    "In general, I have the resources I need to be effective.",
+    "We are working at the right pace to meet our goals.",
+    "I feel empowered to get the work done for which I am responsible.",
+    "I am appropriately involved in decisions that affect my work.",
+  ];
+
+
+
 /*
  * Function to parse and analyze survey data
  */
@@ -9,48 +21,23 @@ function parseData(rawDataInput) {
   }
   //--------------------------------------------------------------------------
 
-  //2D ARRAY VALIDATION-------------------------------------------------------
 
+
+
+  //2D ARRAY VALIDATION------------------------------------------------------- 
+  const { headingsOk, numColsOk, lengthOk } = arrayValidation(arrayDataInput);
+  //--------------------------------------------------------------------------
+
+
+
+
+  
+  // DATA ROW VALIDATION & FILTERING------------------------------------------
   //This is what will be returned
   let averages = {};
 
-  //Validating table data
+  // //Validating table data
   let allInt = true;
-  let lengthOk = false;
-  let numColsOk = false;
-  let headingsOk = false;
-  let validHeadings = [
-    "Employee ID",
-    "Submission time",
-    "I like the kind of work I do.",
-    "In general, I have the resources I need to be effective.",
-    "We are working at the right pace to meet our goals.",
-    "I feel empowered to get the work done for which I am responsible.",
-    "I am appropriately involved in decisions that affect my work.",
-  ];
-
-  let record;
-
-  // Overall array structure validation
-  // Has at least one record apart from header
-  if (arrayDataInput.length >= 2) {
-    lengthOk = true;
-    //Has exactly 7 columns
-    if (arrayDataInput[0].length === validHeadings.length) {
-      numColsOk = true;
-      headingsOk = true;
-      //Has the exact column headings in validHeadings
-      for (let i = 0; i < arrayDataInput[0].length; i++) {
-        if (arrayDataInput[0][i] !== validHeadings[i]) {
-          headingsOk = false;
-          break;
-        }
-      }
-    }
-  }
-  //--------------------------------------------------------------------------
-
-  // DATA ROW VALIDATION & FILTERING------------------------------------------
   // Array to store final records that will be use for analysis
   let finalArr = [];
 
@@ -58,14 +45,14 @@ function parseData(rawDataInput) {
   if (lengthOk && numColsOk && headingsOk) {
     //Printing original table before analysis
     console.log("PRINT ORIGINAL TABLE");
-    printFullTable(arrayDataInput, validHeadings);
+    printFullTable(arrayDataInput, VALID_HEADINGS);
 
     //Iterate through data records
     for (let i = 1; i < arrayDataInput.length; i++) {
       //Checking for malformed rows
       if (
         !Array.isArray(arrayDataInput[i]) ||
-        arrayDataInput[i].length < validHeadings.length
+        arrayDataInput[i].length < VALID_HEADINGS.length
       )
         continue;
       //Skip the record if there is no submission timestamp
@@ -93,6 +80,8 @@ function parseData(rawDataInput) {
           }
         }
       }
+      let record;
+
       //All checks passed so create an object for the record and add the final results array
       if (allInt) {
         record = {
@@ -117,7 +106,7 @@ function parseData(rawDataInput) {
     //PREPARING ANALYISIS TABLE---------------------------------------------
 
     //Preparing new table for average display
-    const questionKeys = validHeadings.slice(2);
+    const questionKeys = VALID_HEADINGS.slice(2);
     averages = Object.fromEntries(questionKeys.map((heading) => [heading, 0]));
     //Keeping track of entries that have answers for a certain question
     const answerCounts = Object.fromEntries(
@@ -206,14 +195,14 @@ function parseCSV(data) {
 /*
  * Helper function to print survey data table-----------------------------------
  */
-function printFullTable(rawDataInput, validHeadings) {
+function printFullTable(rawDataInput, VALID_HEADINGS) {
   const colWidth = 25; //Column width
   console.log(
     "=".repeat(colWidth * rawDataInput[0].length + rawDataInput[0].length * 3)
   ); //Border
 
   //Word wrap column headings since they are small
-  const wrapped = validHeadings.map((h) => {
+  const wrapped = VALID_HEADINGS.map((h) => {
     const words = h.split(" ");
     let line = "";
     const lines = [];
@@ -259,13 +248,14 @@ function printFullTable(rawDataInput, validHeadings) {
 }
 
 /*
- * Helper function to handle different forms of input data-------------------------------
+ * Helper function to handle different forms of input data----------------------
  */
 function inputTypeCheck(rawDataInput){
 
   let checkedDataInput = rawDataInput;
   //2D array (what this function will actually be using)
-  if (Array.isArray(checkedDataInput) && checkedDataInput.length > 0 && checkedDataInput.every(row => Array.isArray(row))) {
+  if (Array.isArray(checkedDataInput) && checkedDataInput.length > 0 && 
+     checkedDataInput.every(row => Array.isArray(row))) {
     console.log("Detected: 2D array");
        
 
@@ -280,6 +270,43 @@ function inputTypeCheck(rawDataInput){
   }
 
   return checkedDataInput;
+}
+
+
+
+
+/*
+ * Helper function to handle 2D array validation--------------------------------
+ */
+
+function arrayValidation(arrayDataInput) {
+  //This is what will be returned
+  
+
+  //Validating table data
+  let lengthOk = false;
+  let numColsOk = false;
+  let headingsOk = false;
+
+  // Overall array structure validation
+  // Has at least one record apart from header
+  if (arrayDataInput.length >= 2) {
+    lengthOk = true;
+    //Has exactly 7 columns
+    if (arrayDataInput[0].length === VALID_HEADINGS.length) {
+      numColsOk = true;
+      headingsOk = true;
+      //Has the exact column headings in validHeadings
+      for (let i = 0; i < arrayDataInput[0].length; i++) {
+        if (arrayDataInput[0][i] !== VALID_HEADINGS[i]) {
+          headingsOk = false;
+          break;
+        }
+      }
+    }
+  }
+
+  return { headingsOk, numColsOk, lengthOk };
 }
 
 /*
